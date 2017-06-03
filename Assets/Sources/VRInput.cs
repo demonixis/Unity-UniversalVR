@@ -41,8 +41,8 @@ namespace Demonixis.Toolbox.VR
     {
         private static VRInput instance = null;
         private Vector2 _tmp = Vector2.zero;
-        private bool[] _axisButtonStats = null;
-        private VRButton[] _axisToButton = null;
+        private bool[] _axisStates = null;
+        private VRButton[] _buttons = null;
         private bool _running = true;
 
         [SerializeField]
@@ -84,14 +84,14 @@ namespace Demonixis.Toolbox.VR
                 return;
             }
 
-            _axisToButton = new VRButton[]
+            _buttons = new VRButton[]
             {
                 VRButton.Grip, VRButton.Trigger,
                 VRButton.ThumbstickUp, VRButton.ThumbstickDown,
                 VRButton.ThumbstickLeft, VRButton.ThumbstickRight
             };
 
-            _axisButtonStats = new bool[_axisToButton.Length * 2];
+            _axisStates = new bool[_buttons.Length * 2];
 
             StartCoroutine(UpdateAxisToButton());
         }
@@ -103,15 +103,21 @@ namespace Demonixis.Toolbox.VR
 
         private IEnumerator UpdateAxisToButton()
         {
+            var endOfFrame = new WaitForEndOfFrame();
+            var index = 0;
+
             while (_running)
             {
-                for (var i = 0; i < _axisToButton.Length; i++)
+                index = 0;
+
+                for (var i = 0; i < _buttons.Length; i++)
                 {
-                    _axisButtonStats[i] = GetButton(_axisToButton[i], true);
-                    _axisButtonStats[i + 1] = GetButton(_axisToButton[i], false);
+                    _axisStates[index] = GetButton(_buttons[i], true);
+                    _axisStates[index + 1] = GetButton(_buttons[i], false);
+                    index += 2;
                 }
 
-                yield return null;
+                yield return endOfFrame;
             }
         }
 
@@ -225,13 +231,18 @@ namespace Demonixis.Toolbox.VR
                 return Input.GetButtonDown(left ? "Button 16" : "Button 17");
 
             // Simulate other buttons using previous states.
-            for (var i = 0; i < _axisToButton.Length; i++)
+            var index = 0;
+            for (var i = 0; i < _buttons.Length; i++)
             {
-                if (_axisToButton[i] != button)
+                if (_buttons[i] != button)
+                {
+                    index += 2;
                     continue;
+                }
 
-                var prev = _axisButtonStats[left ? i : i + 1];
-                var now = GetButton(_axisToButton[i], left);
+                var prev = _axisStates[left ? index : index + 1];
+                var now = GetButton(_buttons[i], left);
+
                 return now && !prev;
             }
 
@@ -273,13 +284,13 @@ namespace Demonixis.Toolbox.VR
                 return Input.GetButtonUp(left ? "Button 16" : "Button 17");
 
             // Simulate other buttons using previous states.
-            for (var i = 0; i < _axisToButton.Length; i++)
+            for (var i = 0; i < _buttons.Length; i++)
             {
-                if (_axisToButton[i] != button)
+                if (_buttons[i] != button)
                     continue;
 
-                var prev = _axisButtonStats[left ? i : i + 1];
-                var now = GetButton(_axisToButton[i], left);
+                var prev = _axisStates[left ? i : i + 1];
+                var now = GetButton(_buttons[i], left);
                 return !now && prev;
             }
 

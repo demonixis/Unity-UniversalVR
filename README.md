@@ -9,6 +9,6 @@ A set of script to simplify your VR developments.
 - [Mythgreen VR](https://demonixis.itch.io/mythgreen-vr)
 - [The Lost Maze](https://demonixis.itch.io/the-lost-maze)
 
-## Licence
-MIT Licence - take a look at the LICENSE file for more informations.
+## License
+MIT License - take a look at the LICENSE file for more informations.
 

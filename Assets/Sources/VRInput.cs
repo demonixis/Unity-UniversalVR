@@ -62,6 +62,24 @@ namespace Demonixis.Toolbox.VR
             }
         }
 
+        public bool IsConnected
+        {
+            get
+            {
+                if (VRSettings.loadedDeviceName == "Oculus")
+                {
+                    var joysticks = Input.GetJoystickNames();
+                    foreach (var joystick in joysticks)
+                        if (joystick.Contains("Oculus"))
+                            return true;
+                }
+                else if (VRSettings.loadedDeviceName == "OpenVR")
+                    return true;
+
+                return false;
+            }
+        }
+
         public float DeadZone
         {
             get { return _deadZone; }
@@ -284,13 +302,18 @@ namespace Demonixis.Toolbox.VR
                 return Input.GetButtonUp(left ? "Button 16" : "Button 17");
 
             // Simulate other buttons using previous states.
+            var index = 0;
             for (var i = 0; i < _buttons.Length; i++)
             {
                 if (_buttons[i] != button)
+                {
+                    index += 2;
                     continue;
+                }
 
-                var prev = _axisStates[left ? i : i + 1];
+                var prev = _axisStates[left ? index : index + 1];
                 var now = GetButton(_buttons[i], left);
+
                 return !now && prev;
             }
 

@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace Demonixis.Toolbox.VR.Editor
+namespace Demonixis.Toolbox.XR.Editor
 {
     [InitializeOnLoad]
-    public static class VRInputLoader
+    public static class XRInputLoader
     {
         private static bool AllowOverride { get; set; }
 
-        static VRInputLoader()
+        static XRInputLoader()
         {
             BindAxisAndButtons();
         }
@@ -26,25 +26,32 @@ namespace Demonixis.Toolbox.VR.Editor
                 BindAxis("Axis 10", 9);
                 BindAxis("Axis 11", 10);
                 BindAxis("Axis 12", 11);
+                BindAxis("Axis 17", 11);
+                BindAxis("Axis 18", 11);
+                BindAxis("Axis 20", 11);
+                BindAxis("Axis 21", 11);
 
                 BindButton("Button 0", "joystick button 0");
                 BindButton("Button 1", "joystick button 1");
                 BindButton("Button 2", "joystick button 2");
                 BindButton("Button 3", "joystick button 3");
+                BindButton("Button 6", "joystick button 6");
                 BindButton("Button 7", "joystick button 7");
                 BindButton("Button 8", "joystick button 8");
                 BindButton("Button 9", "joystick button 9");
                 BindButton("Button 16", "joystick button 16");
                 BindButton("Button 17", "joystick button 17");
+                BindButton("Button 18", "joystick button 18");
+                BindButton("Button 19", "joystick button 19");
             }
             catch
             {
-                Debug.LogError("Failed to apply VR Input manager bindings");
+                Debug.LogError("Failed to apply XR Input manager bindings");
             }
         }
 
-        [MenuItem("Demonixis/VR/Reset Input Binding", false, 100000)]
-        static void ResetInputBinding()
+        [MenuItem("Demonixis/XR/Reset Input Binding", false, 100000)]
+        public static void ResetInputBinding()
         {
             AllowOverride = true;
             BindAxisAndButtons();
@@ -96,7 +103,7 @@ namespace Demonixis.Toolbox.VR.Editor
             serializedObject.ApplyModifiedProperties();
         }
 
-        private class Axis
+        private sealed class Axis
         {
             public string name = string.Empty;
             public string descriptiveName = string.Empty;

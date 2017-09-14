@@ -3,9 +3,9 @@
 using UnityEngine.VR;
 #endif
 
-namespace Demonixis.Toolbox.VR
+namespace Demonixis.Toolbox.XR
 {
-    public class GoogleVRDevice : UnityVRDevice
+    public sealed class GoogleVRDevice : UnityXRDevice
     {
 #region Public Fields
 
@@ -17,7 +17,7 @@ namespace Demonixis.Toolbox.VR
             get
             {
 #if UNITY_ANDROID || UNITY_IOS
-                return !VRDevice.isPresent && VRDevice.model == "cardboard" || VRDevice.model == "daydream";
+                return !UnityEngine.XR.XRDevice.isPresent && UnityEngine.XR.XRDevice.model == "cardboard" || UnityEngine.XR.XRDevice.model == "daydream";
 #else
                 return false;
 #endif
@@ -42,7 +42,7 @@ namespace Demonixis.Toolbox.VR
                 return;
 
 #if UNITY_ANDROID || UNITY_IOS
-            VRSettings.enabled = isEnabled;
+            UnityEngine.XR.XRSettings.enabled = isEnabled;
 #endif
         }
 

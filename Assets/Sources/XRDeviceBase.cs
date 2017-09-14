@@ -4,19 +4,21 @@
 using System;
 using UnityEngine;
 
-namespace Demonixis.Toolbox.VR
+namespace Demonixis.Toolbox.XR
 {
     /// <summary>
     /// The VR Device will create all the structure and add required scripts
     /// to bring VR support to a specific type of HMD. 
     /// </summary>
-    [RequireComponent(typeof(VRManager))]
-    public abstract class VRDeviceBase : MonoBehaviour, IComparable
+    [RequireComponent(typeof(XRManager))]
+    public abstract class XRDeviceBase : MonoBehaviour, IComparable
     {
         protected Transform m_headTransform = null;
 
         [SerializeField]
         protected int m_priority = 0;
+        [SerializeField]
+        private bool _fixHeadPosition = false;
 
         /// <summary>
         /// Gets the check priority of the manager.
@@ -24,6 +26,11 @@ namespace Demonixis.Toolbox.VR
         public int Priority
         {
             get { return m_priority; }
+        }
+
+        public bool FixHeadPosition
+        {
+            get { return _fixHeadPosition; }
         }
 
         /// <summary>
@@ -88,7 +95,7 @@ namespace Demonixis.Toolbox.VR
         /// <returns>Returns 1 if the priority of the other manager is higher, -1 if lower, otherwise it returns 0.</returns>
         public virtual int CompareTo(object obj)
         {
-            var other = obj as VRDeviceBase;
+            var other = obj as XRDeviceBase;
 
             if (other == null)
                 return -1;
@@ -99,23 +106,6 @@ namespace Demonixis.Toolbox.VR
                 return 1;
 
             return 0;
-        }
-
-        protected static Component CopyComponent(Component component, GameObject destination)
-        {
-#if UNITY_METRO
-            // Find a solution
-            return null;
-#else
-            var type = component.GetType();
-            var copy = destination.AddComponent(type);
-            var fields = type.GetFields();
-
-            for (int i = 0, l = fields.Length; i < l; i++)
-                fields[i].SetValue(copy, fields[i].GetValue(component));
-
-            return copy;
-#endif
         }
 
         protected static void Destroy<T>(bool multiple = true) where T : MonoBehaviour

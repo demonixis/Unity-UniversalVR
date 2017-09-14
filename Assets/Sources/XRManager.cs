@@ -4,8 +4,9 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.VR;
 
-namespace Demonixis.Toolbox.VR
+namespace Demonixis.Toolbox.XR
 {
     /// <summary>
     /// Defines the type of SDK.
@@ -22,32 +23,32 @@ namespace Demonixis.Toolbox.VR
     /// The GameVRSettings is responsible to check available VR devices and select the one with the higher priority.
     /// It's also used to Recenter the view.
     /// </summary>
-    public sealed class VRManager : MonoBehaviour
+    public sealed class XRManager : MonoBehaviour
     {
         #region Private Fields
 
-        private static VRDeviceBase activeVRDevice = null;
-        private static VRManager instance = null;
+        private static XRDeviceBase activeVRDevice = null;
+        private static XRManager instance = null;
         private Vector3 _originalHeadPosition = Vector3.zero;
         private bool _vrChecked = false;
 
         #endregion
 
         [SerializeField]
-        private bool _fixHeadPosition = false;
-        [SerializeField]
         private Transform _headNode = null;
         [SerializeField]
         private Vector3 _headFixAxis = Vector3.up;
         [SerializeField]
         private KeyCode _recenterKey = KeyCode.Tab;
+        [SerializeField]
+        private KeyCode _resetOrientationPositionKey = KeyCode.Backspace;
 
-        public VRManager Instance
+        public static XRManager Instance
         {
             get
             {
                 if (instance == null)
-                    instance = FindObjectOfType<VRManager>();
+                    instance = FindObjectOfType<XRManager>();
 
                 return instance;
             }
@@ -75,6 +76,9 @@ namespace Demonixis.Toolbox.VR
 
         private void Update()
         {
+            if (Input.GetKeyDown(_resetOrientationPositionKey))
+                StartCoroutine(RecenterAndFixOffsetCoroutine());
+
             if (Input.GetKeyDown(_recenterKey))
                 Recenter();
         }
@@ -102,8 +106,13 @@ namespace Demonixis.Toolbox.VR
             if (_vrChecked)
                 return activeVRDevice != null ? activeVRDevice.VRDeviceType : VRDeviceType.None;
 
+            if (_headNode == null)
+                _headNode = GetComponent<Transform>();
+
+            _originalHeadPosition = _headNode.localPosition;
+
             // Gets all managers and enable only the first connected device.
-            var vrManagers = GetComponents<VRDeviceBase>();
+            var vrManagers = GetComponents<XRDeviceBase>();
             var count = vrManagers.Length;
             var deviceType = VRDeviceType.None;
 
@@ -121,8 +130,17 @@ namespace Demonixis.Toolbox.VR
                         activeVRDevice.SetActive(true);
                         deviceType = activeVRDevice.VRDeviceType;
 
+                        var resetHeadPosition = UnityEngine.XR.XRSettings.loadedDeviceName.ToLower() == "openvr";
+
+#if UNITY_WSA
+                        resetHeadPosition = true;
+#endif
+
+                        if (resetHeadPosition)
+                            _headNode.localPosition = Vector3.zero;
+
                         if (deviceType != VRDeviceType.OSVR)
-                            RecenterAndFixOffset();
+                            StartCoroutine(RecenterAndFixOffsetCoroutine());
                     }
                     else
                         vrManagers[i].Dispose();
@@ -136,7 +154,7 @@ namespace Demonixis.Toolbox.VR
 
         public void DestroyAll()
         {
-            var devices = GetComponents<VRDeviceBase>();
+            var devices = GetComponents<XRDeviceBase>();
             for (var i = 0; i < devices.Length; i++)
                 Destroy(devices[i]);
 
@@ -149,14 +167,8 @@ namespace Demonixis.Toolbox.VR
 
             Recenter();
 
-            if (!ActiveDevice || !_fixHeadPosition)
+            if (!ActiveDevice || !ActiveDevice.FixHeadPosition)
                 yield break;
-
-            if (_headNode)
-                _headNode = GetComponent<Transform>();
-
-            if (_originalHeadPosition == Vector3.zero)
-                _originalHeadPosition = _headNode.localPosition;
 
             var targetPosition = ActiveDevice.HeadPosition;
 
@@ -232,7 +244,7 @@ namespace Demonixis.Toolbox.VR
         /// <summary>
         /// Gets the current active VR device.
         /// </summary>
-        public static VRDeviceBase ActiveDevice
+        public static XRDeviceBase ActiveDevice
         {
             get { return activeVRDevice; }
         }

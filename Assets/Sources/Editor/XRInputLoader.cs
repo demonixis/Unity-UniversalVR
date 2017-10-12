@@ -46,11 +46,11 @@ namespace Demonixis.Toolbox.XR.Editor
             }
             catch
             {
-                Debug.LogError("Failed to apply XR Input manager bindings");
+                Debug.LogError("Failed to apply VR Input manager bindings");
             }
         }
 
-        [MenuItem("Demonixis/XR/Reset Input Binding", false, 100000)]
+        [MenuItem("Demonixis/VR/Reset Input Binding", false, 100000)]
         public static void ResetInputBinding()
         {
             AllowOverride = true;

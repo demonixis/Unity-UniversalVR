@@ -19,30 +19,15 @@ namespace Demonixis.Toolbox.XR
             set { XRSettings.eyeTextureResolutionScale = value; }
         }
 
-        public override int EyeTextureWidth
-        {
-            get { return XRSettings.eyeTextureWidth; }
-        }
+        public override int EyeTextureWidth { get { return XRSettings.eyeTextureWidth; } }
 
-        public override int EyeTextureHeight
-        {
-            get { return XRSettings.eyeTextureHeight; }
-        }
+        public override int EyeTextureHeight { get { return XRSettings.eyeTextureHeight; } }
 
-        public override VRDeviceType VRDeviceType
-        {
-            get { return VRDeviceType.UnityVR; }
-        }
+        public override VRDeviceType VRDeviceType { get { return VRDeviceType.UnityVR; } }
 
-        public override Vector3 HeadPosition
-        {
-            get { return InputTracking.GetLocalPosition(XRNode.Head); }
-        }
+        public override Vector3 HeadPosition { get { return InputTracking.GetLocalPosition(XRNode.Head); } }
 
-        public override bool IsAvailable
-        {
-            get { return XRDevice.isPresent && XRSettings.enabled; }
-        }
+        public override bool IsAvailable { get { return XRDevice.isPresent && XRSettings.enabled; } }
 
         #endregion
 
@@ -53,22 +38,6 @@ namespace Demonixis.Toolbox.XR
 
         public override void SetActive(bool active)
         {
-			if (XRSettings.enabled != active)
-				XRSettings.enabled = active;
         }
-
-#if UNITY_2017_2
-        private Transform _camera = null;
-
-        public void LateUpdate()
-        {
-            return;
-            if (_camera == null)
-                _camera = Camera.main.transform;
-
-            _camera.localPosition = InputTracking.GetLocalPosition(XRNode.Head);
-            _camera.localRotation = InputTracking.GetLocalRotation(XRNode.Head);
-        }
-#endif
     }
 }

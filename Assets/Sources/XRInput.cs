@@ -70,12 +70,19 @@ namespace Demonixis.Toolbox.XR
             }
         }
 
-        public XRVendor Vendor => _inputVendor;
+        public XRVendor Vendor { get { return _inputVendor; } }
 
         public bool IsConnected
         {
             get
             {
+#if UNITY_WSA
+                var joys = Input.GetJoystickNames();
+                foreach (var joystick in joys)
+                    if (joystick.Contains("Spatial"))
+                        return true;
+#endif
+
                 if (XRSettings.loadedDeviceName == "Oculus")
                 {
                     var joysticks = Input.GetJoystickNames();
@@ -162,14 +169,20 @@ namespace Demonixis.Toolbox.XR
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public virtual Vector3 GetLocalPosition(XRNode node) => InputTracking.GetLocalPosition(node);
+        public virtual Vector3 GetLocalPosition(XRNode node)
+        {
+            return InputTracking.GetLocalPosition(node);
+        }
 
         /// <summary>
         /// Gets the rotation of a specific node.
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public virtual Quaternion GetLocalRotation(XRNode node) => InputTracking.GetLocalRotation(node);
+        public virtual Quaternion GetLocalRotation(XRNode node)
+        {
+            return InputTracking.GetLocalRotation(node);
+        }
 
         /// <summary>
         /// Indicates whether a button is pressed.

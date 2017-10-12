@@ -152,6 +152,11 @@ namespace Demonixis.Toolbox.XR
             return deviceType;
         }
 
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            Recenter();
+        }
+
         public void DestroyAll()
         {
             var devices = GetComponents<XRDeviceBase>();
